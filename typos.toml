@@ -4,7 +4,5 @@ extend-exclude = [
     "!CLAUDE.md",
     "!LICENSE",
     "!README.md",
-    "!ecosystems.go",
-    "!main.go",
-    "!service.go",
+    "!*.go",
 ]
