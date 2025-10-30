@@ -7,10 +7,21 @@ Uses the [Ecosyste.ms](https://ecosyste.ms/) API to get information about a pack
 ## Usage
 
 ```bash
-purlinfo <purl>
+Usage: purlinfo [OPTIONS] purl
 
-# For more information, see the help output
-# purlinfo --help
+Get package information from a package URL (purl).
+
+Arguments:
+  purl    Package URL (e.g., pkg:npm/lodash@4.17.21)
+
+Options:
+  -json
+        Output as JSON
+  -timeout duration
+        HTTP request timeout (default 30s)
+  -v    Verbose output (debug mode)
+  -version
+        Show version and exit
 ```
 
 ## License
