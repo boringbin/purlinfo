@@ -1,6 +1,9 @@
 # Run the tests
 name: test
 
+permissions:
+  contents: read
+
 on:
   push:
     branches:
