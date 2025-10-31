@@ -399,11 +399,6 @@ func equalStringSlices(a, b []string) bool {
 	return true
 }
 
-// stringPtr returns a pointer to a string.
-func stringPtr(s string) *string {
-	return &s
-}
-
 // equalStringPtrs compares two string pointers.
 func equalStringPtrs(a, b *string) bool {
 	if a == nil && b == nil {

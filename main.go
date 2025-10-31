@@ -205,9 +205,10 @@ func printLicenses(licenses []string) {
 
 // printOptionalField prints an optional field (nullable string pointer).
 func printOptionalField(label string, value *string) {
-	// Calculate padding to align values.
-	const totalWidth = 17
-	padding := totalWidth - len(label)
+	// labelColumnWidth is set to 17 to match the longest label "DocumentationURL:" (17 chars).
+	// This ensures all field values are aligned at the same column.
+	const labelColumnWidth = 17
+	padding := labelColumnWidth - len(label)
 
 	if value != nil && *value != "" {
 		fmt.Fprintf(os.Stdout, "%s%*s%s\n", label, padding, "", *value)
