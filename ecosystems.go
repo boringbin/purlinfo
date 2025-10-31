@@ -62,6 +62,10 @@ type ecosystemsPackagesLookupResponse struct {
 	Name                string   `json:"name"`
 	LatestReleaseNumber string   `json:"latest_release_number"`
 	NormalizedLicenses  []string `json:"normalized_licenses"`
+	Homepage            *string  `json:"homepage"`
+	RepositoryURL       *string  `json:"repository_url"`
+	Description         *string  `json:"description"`
+	DocumentationURL    *string  `json:"documentation_url"`
 }
 
 // GetPackageInfo returns the information about a package.
@@ -109,9 +113,14 @@ func (s *EcosystemsService) GetPackageInfo(ctx context.Context, purl packageurl.
 
 	// Convert the response to the PackageInfo struct
 	packageInfo := PackageInfo{
-		Name:     result.Name,
-		Version:  result.LatestReleaseNumber,
-		Licenses: result.NormalizedLicenses,
+		Name:             result.Name,
+		Version:          result.LatestReleaseNumber,
+		Licenses:         result.NormalizedLicenses,
+		Homepage:         result.Homepage,
+		RepositoryURL:    result.RepositoryURL,
+		Description:      result.Description,
+		Ecosystem:        purl.Type,
+		DocumentationURL: result.DocumentationURL,
 	}
 
 	return packageInfo, nil

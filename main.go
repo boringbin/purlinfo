@@ -164,21 +164,55 @@ func createService(httpClient *http.Client) Service {
 // printOutput prints the output based on the outputJSON flag.
 func printOutput(info PackageInfo, outputJSON bool) error {
 	if outputJSON {
-		// JSON output
-		encoder := json.NewEncoder(os.Stdout)
-		encoder.SetIndent("", "  ")
-		if encodeErr := encoder.Encode(info); encodeErr != nil {
-			return fmt.Errorf("failed to encode JSON: %w", encodeErr)
-		}
-	} else {
-		// Human-readable output
-		fmt.Fprintf(os.Stdout, "Name:     %s\n", info.Name)
-		fmt.Fprintf(os.Stdout, "Version:  %s\n", info.Version)
-		if len(info.Licenses) > 0 {
-			fmt.Fprintf(os.Stdout, "Licenses: %s\n", strings.Join(info.Licenses, ", "))
-		} else {
-			fmt.Fprintf(os.Stdout, "Licenses: (none)\n")
-		}
+		return printJSONOutput(info)
+	}
+	return printHumanReadableOutput(info)
+}
+
+// printJSONOutput prints the package info as JSON.
+func printJSONOutput(info PackageInfo) error {
+	encoder := json.NewEncoder(os.Stdout)
+	encoder.SetIndent("", "  ")
+	if encodeErr := encoder.Encode(info); encodeErr != nil {
+		return fmt.Errorf("failed to encode JSON: %w", encodeErr)
 	}
 	return nil
+}
+
+// printHumanReadableOutput prints the package info in human-readable format.
+func printHumanReadableOutput(info PackageInfo) error {
+	fmt.Fprintf(os.Stdout, "Name:            %s\n", info.Name)
+	fmt.Fprintf(os.Stdout, "Version:         %s\n", info.Version)
+	fmt.Fprintf(os.Stdout, "Ecosystem:       %s\n", info.Ecosystem)
+
+	printLicenses(info.Licenses)
+	printOptionalField("Description:", info.Description)
+	printOptionalField("Homepage:", info.Homepage)
+	printOptionalField("RepositoryURL:", info.RepositoryURL)
+	printOptionalField("DocumentationURL:", info.DocumentationURL)
+
+	return nil
+}
+
+// printLicenses prints the licenses field.
+func printLicenses(licenses []string) {
+	if len(licenses) > 0 {
+		fmt.Fprintf(os.Stdout, "Licenses:        %s\n", strings.Join(licenses, ", "))
+	} else {
+		fmt.Fprintf(os.Stdout, "Licenses:        (none)\n")
+	}
+}
+
+// printOptionalField prints an optional field (nullable string pointer).
+func printOptionalField(label string, value *string) {
+	// labelColumnWidth is set to 17 to match the longest label "DocumentationURL:" (17 chars).
+	// This ensures all field values are aligned at the same column.
+	const labelColumnWidth = 17
+	padding := labelColumnWidth - len(label)
+
+	if value != nil && *value != "" {
+		fmt.Fprintf(os.Stdout, "%s%*s%s\n", label, padding, "", *value)
+	} else {
+		fmt.Fprintf(os.Stdout, "%s%*s(none)\n", label, padding, "")
+	}
 }
