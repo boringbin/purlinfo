@@ -1,6 +1,9 @@
 # Checks for typos in the repository
 name: typos
 
+permissions:
+  contents: read
+
 on:
   pull_request:
   push:
