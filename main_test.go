@@ -8,6 +8,7 @@ import (
 	"flag"
 	"io"
 	"log/slog"
+	"net/http"
 	"os"
 	"strings"
 	"testing"
@@ -91,6 +92,47 @@ func TestSetupLogger(t *testing.T) {
 
 			// Logger should be configured but we can't easily inspect the level
 			// We mainly test that it doesn't panic and returns a logger
+		})
+	}
+}
+
+// TestCreateService tests the createService function.
+func TestCreateService(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name       string
+		httpClient *http.Client
+	}{
+		{
+			name:       "with nil client",
+			httpClient: nil,
+		},
+		{
+			name:       "with custom client",
+			httpClient: &http.Client{Timeout: 10 * time.Second},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			service := createService(tt.httpClient)
+			if service == nil {
+				t.Fatal("createService() returned nil")
+			}
+
+			// Verify it returns an EcosystemsService
+			ecosystemsService, ok := service.(*EcosystemsService)
+			if !ok {
+				t.Errorf("createService() returned %T, want *EcosystemsService", service)
+			}
+
+			// Verify the HTTP client is set correctly
+			if tt.httpClient != nil && ecosystemsService.client != tt.httpClient {
+				t.Error("createService() did not use the provided HTTP client")
+			}
 		})
 	}
 }

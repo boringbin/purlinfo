@@ -155,6 +155,38 @@ func TestEcosystemsService_GetPackageInfo(t *testing.T) {
 			wantErr:        true,
 			errContains:    "invalid API response",
 		},
+		{
+			name:           "HTTP 429 rate limit error",
+			mockResponse:   `{"error": "too many requests"}`,
+			mockStatusCode: http.StatusTooManyRequests,
+			purl:           "pkg:npm/test@1.0.0",
+			wantErr:        true,
+			errContains:    "rate limited",
+		},
+		{
+			name:           "HTTP 502 bad gateway error",
+			mockResponse:   `{"error": "bad gateway"}`,
+			mockStatusCode: http.StatusBadGateway,
+			purl:           "pkg:npm/test@1.0.0",
+			wantErr:        true,
+			errContains:    "service unavailable",
+		},
+		{
+			name:           "HTTP 503 service unavailable error",
+			mockResponse:   `{"error": "service unavailable"}`,
+			mockStatusCode: http.StatusServiceUnavailable,
+			purl:           "pkg:npm/test@1.0.0",
+			wantErr:        true,
+			errContains:    "service unavailable",
+		},
+		{
+			name:           "HTTP 504 gateway timeout error",
+			mockResponse:   `{"error": "gateway timeout"}`,
+			mockStatusCode: http.StatusGatewayTimeout,
+			purl:           "pkg:npm/test@1.0.0",
+			wantErr:        true,
+			errContains:    "service unavailable",
+		},
 	}
 
 	for _, tt := range tests {
