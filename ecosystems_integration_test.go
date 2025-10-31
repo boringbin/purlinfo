@@ -17,30 +17,34 @@ func TestEcosystemsService_Integration(t *testing.T) {
 	}
 
 	tests := []struct {
-		name        string
-		purl        string
-		wantName    string
-		wantVersion string // This might change as packages are updated
-		wantLicense string // At least one license should contain this
+		name          string
+		purl          string
+		wantName      string
+		wantVersion   string // This might change as packages are updated
+		wantLicense   string // At least one license should contain this
+		wantEcosystem string
 	}{
 		{
-			name:        "npm package",
-			purl:        "pkg:npm/lodash@4.17.21",
-			wantName:    "lodash",
-			wantVersion: "4.17.21", // Latest version might be higher
-			wantLicense: "MIT",
+			name:          "npm package",
+			purl:          "pkg:npm/lodash@4.17.21",
+			wantName:      "lodash",
+			wantVersion:   "4.17.21", // Latest version might be higher
+			wantLicense:   "MIT",
+			wantEcosystem: "npm",
 		},
 		{
-			name:        "pypi package",
-			purl:        "pkg:pypi/requests@2.28.0",
-			wantName:    "requests",
-			wantLicense: "Apache",
+			name:          "pypi package",
+			purl:          "pkg:pypi/requests@2.28.0",
+			wantName:      "requests",
+			wantLicense:   "Apache",
+			wantEcosystem: "pypi",
 		},
 		{
-			name:        "npm scoped package",
-			purl:        "pkg:npm/%40types/node@18.0.0",
-			wantName:    "@types/node",
-			wantLicense: "MIT",
+			name:          "npm scoped package",
+			purl:          "pkg:npm/%40types/node@18.0.0",
+			wantName:      "@types/node",
+			wantLicense:   "MIT",
+			wantEcosystem: "npm",
 		},
 	}
 
@@ -79,6 +83,11 @@ func TestEcosystemsService_Integration(t *testing.T) {
 				t.Logf("Note: Version = %q, expected %q (version may have been updated)", got.Version, tt.wantVersion)
 			}
 
+			// Verify ecosystem matches expected
+			if got.Ecosystem != tt.wantEcosystem {
+				t.Errorf("GetPackageInfo() Ecosystem = %q, want %q", got.Ecosystem, tt.wantEcosystem)
+			}
+
 			// Verify at least one license contains expected string
 			if tt.wantLicense != "" {
 				found := false
@@ -93,7 +102,18 @@ func TestEcosystemsService_Integration(t *testing.T) {
 				}
 			}
 
-			t.Logf("Successfully retrieved: %s v%s (licenses: %v)", got.Name, got.Version, got.Licenses)
+			// Verify new fields are present (at least some should have values)
+			// Note: We don't check exact values as they may change, but we verify they're not all nil
+			hasAnyMetadata := (got.Homepage != nil && *got.Homepage != "") ||
+				(got.RepositoryURL != nil && *got.RepositoryURL != "") ||
+				(got.Description != nil && *got.Description != "") ||
+				(got.DocumentationURL != nil && *got.DocumentationURL != "")
+
+			if !hasAnyMetadata {
+				t.Error("GetPackageInfo() all metadata fields (Homepage, RepositoryURL, Description, DocumentationURL) are empty")
+			}
+
+			t.Logf("Successfully retrieved: %s v%s (ecosystem: %s, licenses: %v)", got.Name, got.Version, got.Ecosystem, got.Licenses)
 		})
 	}
 }
