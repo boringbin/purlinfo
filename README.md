@@ -8,7 +8,7 @@ Uses the [Ecosyste.ms](https://ecosyste.ms/) API to get information about a pack
 
 ## Usage
 
-```bash
+```text
 Usage: purlinfo [OPTIONS] purl
 
 Get package information from a package URL (purl).
