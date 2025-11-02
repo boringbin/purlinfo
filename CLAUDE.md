@@ -21,6 +21,14 @@ See [README.md](README.md) for usage, CLI flags, and project overview.
 
 **Quick Commands:** `make test`, `make lint-check`, `make format-check` before submitting changes.
 
+**Version Management:**
+- Version in source code is always `var version = "dev"` on main branch
+- Local builds (`make`) show version as "dev"
+- GoReleaser injects git tag version via ldflags when creating releases
+- To release: `git tag -a v0.1.0 -m "Release v0.1.0"` then `git push origin v0.1.0`
+- GitHub Actions automatically runs goreleaser on tag push and creates GitHub release
+- No manual version bumps needed in source code
+
 **Test Organization:**
 - Unit tests (`*_test.go`): Fast, use mocks, run by default with `make test`
 - Integration tests (`*_integration_test.go`): Require network, use `//go:build integration` tag, run with `make test-integration`
