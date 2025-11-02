@@ -35,3 +35,6 @@ go.work.sum
 # Binaries
 bin/**
 !bin/.gitkeep
+
+# goreleaser
+dist/
