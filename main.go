@@ -15,9 +15,12 @@ import (
 	"github.com/package-url/packageurl-go"
 )
 
+// version is the version of the `purlinfo` CLI.
+// Set to "dev" by default for local builds.
+// Overridden by goreleaser via -ldflags "-X main.version=v0.1.0" when creating releases.
+var version = "dev"
+
 const (
-	// version is the version of the `purlinfo` CLI.
-	version = "0.1.0-dev"
 	// exitSuccess is the exit code for success.
 	exitSuccess = 0
 	// exitInvalidArgs is the exit code for invalid arguments.
