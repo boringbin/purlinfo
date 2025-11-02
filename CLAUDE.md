@@ -23,18 +23,24 @@ bin/purlinfo -v 'pkg:npm/lodash@4.17.21'
 # Custom timeout
 bin/purlinfo -timeout 10s 'pkg:npm/lodash@4.17.21'
 
+# With email for polite pool access
+bin/purlinfo -email 'you@example.com' 'pkg:npm/lodash@4.17.21'
+
 # Show version
 bin/purlinfo -version
 ```
 
 ### CLI Flags
 
+- `-email` (string): Email for polite pool access (optional, default: "")
 - `-json` (bool): Output as JSON instead of human-readable format
 - `-v` (bool): Verbose output with debug logging
 - `-version` (bool): Show version and exit
 - `-timeout` (duration): HTTP request timeout (default: 30s)
 
 **Note:** Go's `flag` package uses single dash for all flags (e.g., `-json`, not `--json`). The `-v` flag for verbose follows Go's idiomatic CLI conventions.
+
+**Polite Pool:** The `-email` flag provides access to Ecosyste.ms polite pool, a priority queue for known users. When provided, the email is included in the User-Agent header as `purlinfo/VERSION (mailto:EMAIL)`. This allows the API to contact you about fair usage and rate limits. Without an email, the User-Agent is simply `purlinfo/VERSION`.
 
 ### Exit Codes
 
@@ -118,6 +124,10 @@ The project is built around a service-based architecture with a well-defined int
 - Constructor: `NewEcosystemsService(opts EcosystemsServiceOptions)` with simplified options:
   - `BaseURL string` - Empty string uses default, no pointer indirection
   - `Client *http.Client` - Nil uses `http.DefaultClient`
+  - `Email string` - Optional email for polite pool access (empty = no polite pool)
+- Always sets User-Agent header:
+  - Without email: `purlinfo/VERSION`
+  - With email: `purlinfo/VERSION (mailto:EMAIL)`
 - Maps Ecosyste.ms API response via unexported `ecosystemsPackagesLookupResponse` type:
   - `name` → `Name`
   - `latest_release_number` → `Version`
@@ -137,12 +147,12 @@ The project is built around a service-based architecture with a well-defined int
 - Use with `errors.Is()` for robust error handling
 
 **CLI Implementation** (main.go)
-- Uses standard `flag` package for argument parsing (Go idioms: `-v`, `-json`, `-timeout`)
+- Uses standard `flag` package for argument parsing (Go idioms: `-v`, `-json`, `-timeout`, `-email`)
 - Main function delegates to `run() int` to properly handle deferred cleanup and exit codes
 - Helper functions for separation of concerns:
   - `printUsage()`: Custom usage message
   - `setupLogger(verbose bool)`: Creates slog.Logger with appropriate level
-  - `createService(httpClient)`: Creates EcosystemsService (no service selection)
+  - `createService(httpClient, email)`: Creates EcosystemsService (no service selection)
   - `printOutput(info, outputJSON)`: Handles both output formats
 - Structured logging with `log/slog` (required by linter rules)
 - HTTP client configured with timeout from CLI flag

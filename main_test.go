@@ -118,7 +118,7 @@ func TestCreateService(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			service := createService(tt.httpClient)
+			service := createService(tt.httpClient, "")
 			if service == nil {
 				t.Fatal("createService() returned nil")
 			}
