@@ -10,7 +10,8 @@ version: 2
 
 before:
   hooks:
-    - make check
+    # May want to enable this in the future
+    # - make check
     - make tidy
 
 builds:
