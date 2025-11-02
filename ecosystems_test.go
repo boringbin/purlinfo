@@ -52,6 +52,29 @@ func TestNewEcosystemsService(t *testing.T) {
 			t.Error("client should be the provided custom client")
 		}
 	})
+
+	t.Run("with email", func(t *testing.T) {
+		t.Parallel()
+
+		email := "test@example.com"
+		service := NewEcosystemsService(EcosystemsServiceOptions{
+			Email: email,
+		})
+
+		if service.email != email {
+			t.Errorf("email = %q, want %q", service.email, email)
+		}
+	})
+
+	t.Run("without email", func(t *testing.T) {
+		t.Parallel()
+
+		service := NewEcosystemsService(EcosystemsServiceOptions{})
+
+		if service.email != "" {
+			t.Errorf("email = %q, want empty string", service.email)
+		}
+	})
 }
 
 // TestEcosystemsService_GetPackageInfo tests the GetPackageInfo method.
@@ -368,6 +391,78 @@ func TestEcosystemsService_GetPackageInfo_Timeout(t *testing.T) {
 	if err == nil {
 		t.Error("GetPackageInfo() with timeout should return error")
 	}
+}
+
+// TestEcosystemsService_UserAgent tests that the User-Agent header is set correctly.
+func TestEcosystemsService_UserAgent(t *testing.T) {
+	t.Parallel()
+
+	t.Run("without email", func(t *testing.T) {
+		t.Parallel()
+
+		// Create mock server that checks User-Agent header.
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			userAgent := r.Header.Get("User-Agent")
+			expectedUserAgent := "purlinfo/" + version
+			if userAgent != expectedUserAgent {
+				t.Errorf("User-Agent = %q, want %q", userAgent, expectedUserAgent)
+			}
+
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`[{"name":"test","latest_release_number":"1.0.0","normalized_licenses":[]}]`))
+		}))
+		t.Cleanup(server.Close)
+
+		service := NewEcosystemsService(EcosystemsServiceOptions{
+			BaseURL: server.URL,
+		})
+
+		purl, err := packageurl.FromString("pkg:npm/test@1.0.0")
+		if err != nil {
+			t.Fatalf("failed to parse purl: %v", err)
+		}
+
+		ctx := context.Background()
+		_, err = service.GetPackageInfo(ctx, purl)
+		if err != nil {
+			t.Errorf("GetPackageInfo() unexpected error = %v", err)
+		}
+	})
+
+	t.Run("with email", func(t *testing.T) {
+		t.Parallel()
+
+		email := "test@example.com"
+
+		// Create mock server that checks User-Agent header.
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			userAgent := r.Header.Get("User-Agent")
+			expectedUserAgent := "purlinfo/" + version + " (mailto:" + email + ")"
+			if userAgent != expectedUserAgent {
+				t.Errorf("User-Agent = %q, want %q", userAgent, expectedUserAgent)
+			}
+
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`[{"name":"test","latest_release_number":"1.0.0","normalized_licenses":[]}]`))
+		}))
+		t.Cleanup(server.Close)
+
+		service := NewEcosystemsService(EcosystemsServiceOptions{
+			BaseURL: server.URL,
+			Email:   email,
+		})
+
+		purl, err := packageurl.FromString("pkg:npm/test@1.0.0")
+		if err != nil {
+			t.Fatalf("failed to parse purl: %v", err)
+		}
+
+		ctx := context.Background()
+		_, err = service.GetPackageInfo(ctx, purl)
+		if err != nil {
+			t.Errorf("GetPackageInfo() unexpected error = %v", err)
+		}
+	})
 }
 
 // contains checks if a string contains a substring.

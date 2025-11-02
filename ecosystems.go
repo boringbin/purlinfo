@@ -24,6 +24,7 @@ const (
 type EcosystemsService struct {
 	baseURL string
 	client  *http.Client
+	email   string
 }
 
 var _ Service = (*EcosystemsService)(nil)
@@ -36,6 +37,9 @@ type EcosystemsServiceOptions struct {
 	// Client is the HTTP client to use for the Ecosystems API.
 	// If nil, defaults to http.DefaultClient.
 	Client *http.Client
+	// Email is the email address for the polite pool.
+	// If empty, requests will not include polite pool identification.
+	Email string
 }
 
 // NewEcosystemsService creates a new EcosystemsService.
@@ -54,6 +58,7 @@ func NewEcosystemsService(opts EcosystemsServiceOptions) *EcosystemsService {
 	return &EcosystemsService{
 		baseURL: baseURL,
 		client:  client,
+		email:   opts.Email,
 	}
 }
 
@@ -76,6 +81,14 @@ func (s *EcosystemsService) GetPackageInfo(ctx context.Context, purl packageurl.
 	if err != nil {
 		return PackageInfo{}, fmt.Errorf("failed to create HTTP request: %w", err)
 	}
+
+	// Set User-Agent header
+	userAgent := fmt.Sprintf("purlinfo/%s", version)
+	if s.email != "" {
+		// See https://ecosyste.ms/api
+		userAgent = fmt.Sprintf("purlinfo/%s (mailto:%s)", version, s.email)
+	}
+	req.Header.Set("User-Agent", userAgent)
 
 	response, err := s.client.Do(req)
 	if err != nil {

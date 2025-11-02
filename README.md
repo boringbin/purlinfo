@@ -17,6 +17,8 @@ Arguments:
   purl    Package URL (e.g., pkg:npm/lodash@4.17.21)
 
 Options:
+  -email string
+        Email for polite pool (optional)
   -json
         Output as JSON
   -timeout duration

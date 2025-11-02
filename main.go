@@ -40,6 +40,7 @@ func run() int {
 		verbose     = flag.Bool("v", false, "Verbose output (debug mode)")
 		showVersion = flag.Bool("version", false, "Show version and exit")
 		timeout     = flag.Duration("timeout", defaultTimeoutSec*time.Second, "HTTP request timeout")
+		email       = flag.String("email", "", "Email for polite pool (optional)")
 	)
 
 	// Customize usage message
@@ -88,7 +89,7 @@ func run() int {
 	}
 
 	// Create service
-	service := createService(httpClient)
+	service := createService(httpClient, *email)
 
 	// Delegate to runWithService for the core logic
 	return runWithService(service, logger, purl, purlString, *verbose, *outputJSON, *timeout)
@@ -155,9 +156,10 @@ func setupLogger(verbose bool) *slog.Logger {
 }
 
 // createService creates the service.
-func createService(httpClient *http.Client) Service {
+func createService(httpClient *http.Client, email string) Service {
 	return NewEcosystemsService(EcosystemsServiceOptions{
 		Client: httpClient,
+		Email:  email,
 	})
 }
 
