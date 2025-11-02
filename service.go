@@ -24,16 +24,16 @@ type PackageInfo struct {
 	Version string `json:"version"`
 	// The licenses of the package.
 	Licenses []string `json:"licenses"`
-	// The homepage URL of the package (nullable).
-	Homepage *string `json:"homepage"`
-	// The repository URL of the package (nullable).
-	RepositoryURL *string `json:"repository_url"`
-	// The description of the package (nullable).
-	Description *string `json:"description"`
+	// The homepage URL of the package (empty string if not available).
+	Homepage string `json:"homepage,omitempty"`
+	// The repository URL of the package (empty string if not available).
+	RepositoryURL string `json:"repository_url,omitempty"`
+	// The description of the package (empty string if not available).
+	Description string `json:"description,omitempty"`
 	// The ecosystem/type of the package (e.g., npm, pypi, cargo).
 	Ecosystem string `json:"ecosystem"`
-	// The documentation URL of the package (nullable).
-	DocumentationURL *string `json:"documentation_url"`
+	// The documentation URL of the package (empty string if not available).
+	DocumentationURL string `json:"documentation_url,omitempty"`
 }
 
 // Service is the interface that each service must implement.

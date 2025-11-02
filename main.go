@@ -205,15 +205,15 @@ func printLicenses(licenses []string) {
 	}
 }
 
-// printOptionalField prints an optional field (nullable string pointer).
-func printOptionalField(label string, value *string) {
+// printOptionalField prints an optional field (empty string if not available).
+func printOptionalField(label string, value string) {
 	// labelColumnWidth is set to 17 to match the longest label "DocumentationURL:" (17 chars).
 	// This ensures all field values are aligned at the same column.
 	const labelColumnWidth = 17
 	padding := labelColumnWidth - len(label)
 
-	if value != nil && *value != "" {
-		fmt.Fprintf(os.Stdout, "%s%*s%s\n", label, padding, "", *value)
+	if value != "" {
+		fmt.Fprintf(os.Stdout, "%s%*s%s\n", label, padding, "", value)
 	} else {
 		fmt.Fprintf(os.Stdout, "%s%*s(none)\n", label, padding, "")
 	}

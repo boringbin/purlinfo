@@ -107,11 +107,11 @@ func TestEcosystemsService_GetPackageInfo(t *testing.T) {
 				Name:             "lodash",
 				Version:          "4.17.21",
 				Licenses:         []string{"MIT"},
-				Homepage:         stringPtr("https://lodash.com/"),
-				RepositoryURL:    stringPtr("https://github.com/lodash/lodash"),
-				Description:      stringPtr("Lodash modular utilities."),
+				Homepage:         "https://lodash.com/",
+				RepositoryURL:    "https://github.com/lodash/lodash",
+				Description:      "Lodash modular utilities.",
 				Ecosystem:        "npm",
-				DocumentationURL: stringPtr("https://lodash.com/docs"),
+				DocumentationURL: "https://lodash.com/docs",
 			},
 			wantErr: false,
 		},
@@ -131,11 +131,11 @@ func TestEcosystemsService_GetPackageInfo(t *testing.T) {
 				Name:             "requests",
 				Version:          "2.32.5",
 				Licenses:         []string{"Apache-2.0", "MIT"},
-				Homepage:         stringPtr("https://requests.readthedocs.io"),
-				RepositoryURL:    stringPtr("https://github.com/psf/requests"),
-				Description:      stringPtr("Python HTTP for Humans."),
+				Homepage:         "https://requests.readthedocs.io",
+				RepositoryURL:    "https://github.com/psf/requests",
+				Description:      "Python HTTP for Humans.",
 				Ecosystem:        "pypi",
-				DocumentationURL: nil,
+				DocumentationURL: "",
 			},
 			wantErr: false,
 		},
@@ -152,11 +152,11 @@ func TestEcosystemsService_GetPackageInfo(t *testing.T) {
 				Name:             "testpkg",
 				Version:          "1.0.0",
 				Licenses:         []string{},
-				Homepage:         nil,
-				RepositoryURL:    nil,
-				Description:      nil,
+				Homepage:         "",
+				RepositoryURL:    "",
+				Description:      "",
 				Ecosystem:        "npm",
-				DocumentationURL: nil,
+				DocumentationURL: "",
 			},
 			wantErr: false,
 		},
@@ -301,32 +301,32 @@ func TestEcosystemsService_GetPackageInfo(t *testing.T) {
 			if !equalStringSlices(got.Licenses, tt.want.Licenses) {
 				t.Errorf("GetPackageInfo() Licenses = %v, want %v", got.Licenses, tt.want.Licenses)
 			}
-			if !equalStringPtrs(got.Homepage, tt.want.Homepage) {
+			if got.Homepage != tt.want.Homepage {
 				t.Errorf(
 					"GetPackageInfo() Homepage = %v, want %v",
-					stringPtrToString(got.Homepage),
-					stringPtrToString(tt.want.Homepage),
+					got.Homepage,
+					tt.want.Homepage,
 				)
 			}
-			if !equalStringPtrs(got.RepositoryURL, tt.want.RepositoryURL) {
+			if got.RepositoryURL != tt.want.RepositoryURL {
 				t.Errorf(
 					"GetPackageInfo() RepositoryURL = %v, want %v",
-					stringPtrToString(got.RepositoryURL),
-					stringPtrToString(tt.want.RepositoryURL),
+					got.RepositoryURL,
+					tt.want.RepositoryURL,
 				)
 			}
-			if !equalStringPtrs(got.Description, tt.want.Description) {
+			if got.Description != tt.want.Description {
 				t.Errorf(
 					"GetPackageInfo() Description = %v, want %v",
-					stringPtrToString(got.Description),
-					stringPtrToString(tt.want.Description),
+					got.Description,
+					tt.want.Description,
 				)
 			}
-			if !equalStringPtrs(got.DocumentationURL, tt.want.DocumentationURL) {
+			if got.DocumentationURL != tt.want.DocumentationURL {
 				t.Errorf(
 					"GetPackageInfo() DocumentationURL = %v, want %v",
-					stringPtrToString(got.DocumentationURL),
-					stringPtrToString(tt.want.DocumentationURL),
+					got.DocumentationURL,
+					tt.want.DocumentationURL,
 				)
 			}
 		})
@@ -492,23 +492,4 @@ func equalStringSlices(a, b []string) bool {
 		}
 	}
 	return true
-}
-
-// equalStringPtrs compares two string pointers.
-func equalStringPtrs(a, b *string) bool {
-	if a == nil && b == nil {
-		return true
-	}
-	if a == nil || b == nil {
-		return false
-	}
-	return *a == *b
-}
-
-// stringPtrToString converts a string pointer to a string for display.
-func stringPtrToString(s *string) string {
-	if s == nil {
-		return "<nil>"
-	}
-	return *s
 }

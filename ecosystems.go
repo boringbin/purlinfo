@@ -73,6 +73,14 @@ type ecosystemsPackagesLookupResponse struct {
 	DocumentationURL    *string  `json:"documentation_url"`
 }
 
+// stringValue converts a *string to string, returning empty string if nil.
+func stringValue(s *string) string {
+	if s == nil {
+		return ""
+	}
+	return *s
+}
+
 // GetPackageInfo returns the information about a package.
 func (s *EcosystemsService) GetPackageInfo(ctx context.Context, purl packageurl.PackageURL) (PackageInfo, error) {
 	apiURL := fmt.Sprintf("%s%s?purl=%s", s.baseURL, ecosystemsAPIPath, url.QueryEscape(purl.String()))
@@ -129,11 +137,11 @@ func (s *EcosystemsService) GetPackageInfo(ctx context.Context, purl packageurl.
 		Name:             result.Name,
 		Version:          result.LatestReleaseNumber,
 		Licenses:         result.NormalizedLicenses,
-		Homepage:         result.Homepage,
-		RepositoryURL:    result.RepositoryURL,
-		Description:      result.Description,
+		Homepage:         stringValue(result.Homepage),
+		RepositoryURL:    stringValue(result.RepositoryURL),
+		Description:      stringValue(result.Description),
 		Ecosystem:        purl.Type,
-		DocumentationURL: result.DocumentationURL,
+		DocumentationURL: stringValue(result.DocumentationURL),
 	}
 
 	return packageInfo, nil
